@@ -8,6 +8,7 @@ import { Ingredient } from './shared/ingredients.model';
 })
 export class ShoppingListService {
   newIngredient = new Subject<Ingredient[]>();
+  selectIngredient = new Subject<Ingredient>();
 
   private ingredients: Ingredient[] = [
     new Ingredient('Apples', 5),
@@ -20,8 +21,23 @@ export class ShoppingListService {
     return this.ingredients.slice();
   }
 
-  addIngredient(ingredient: Ingredient) {
-    this.ingredients.push(ingredient);
+  getIngredient(index: number) {
+    return this.ingredients.slice()[index];
+  }
+
+  getIndex(ingredient: Ingredient): number {
+    return this.ingredients.findIndex((elem) => {
+      return elem.name === ingredient.name;
+    });
+  }
+
+  addIngredient(newIngredient: Ingredient) {
+    const index = this.getIndex(newIngredient);
+    if(index === -1) {
+      this.ingredients.push(newIngredient);
+    } else {
+      this.ingredients.splice(index, 1, newIngredient);
+    }
     this.newIngredient.next(this.ingredients);
   }
   
@@ -31,7 +47,9 @@ export class ShoppingListService {
   }
   
   removeIngredient(id: number) {
-    this.ingredients.slice(id, 1);
+    console.log('remove item number ' + id);
+    this.ingredients.splice(id, 1);
     this.newIngredient.next(this.ingredients);
+    console.log('new array: ' + this.ingredients.map((elem) => elem.name));
   }
 }
